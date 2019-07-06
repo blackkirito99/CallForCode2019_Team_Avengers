@@ -385,16 +385,16 @@ app.put('/api/regions', function(request, response) {
 
 function createResponseData(doc) {
 
-                        var responseData = createResponseData(
-                            doc.id,
-                            doc.name,
-                            doc.injured,
-                            doc.building, 
-                            doc.population, 
-                            doc.rescue, 
-                            doc.hospital, 
-                            doc.needed,
-                            doc.location);
+                        var responseData = {
+                            id: doc.id,
+                            name: doc.name,
+                            injured: doc.injured,
+                            building: doc.building, 
+                            population: doc.population, 
+                            rescue: doc.rescue, 
+                            hospital: doc.hospital, 
+                            needed: doc.needed,
+                            location: doc.location }
  return responseData;
 }
 
