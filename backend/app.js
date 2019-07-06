@@ -92,52 +92,33 @@ initDBConnection();
 
 app.get('/', routes.index);
 
-function createResponseData(id, name, value, attachments) {
+// function createResponseData(id, name, value, attachments) {
 
-    var responseData = {
-        id: id,
-        name: sanitizeInput(name),
-        value: sanitizeInput(value),
-        attachements: []
-    };
+//     var responseData = {
+//         id: id,
+//         name: sanitizeInput(name),
+//         value: sanitizeInput(value),
+//         attachements: []
+//     };
 
 
-    attachments.forEach(function(item, index) {
-        var attachmentData = {
-            content_type: item.type,
-            key: item.key,
-            url: '/api/favorites/attach?id=' + id + '&key=' + item.key
-        };
-        responseData.attachements.push(attachmentData);
+//     attachments.forEach(function(item, index) {
+//         var attachmentData = {
+//             content_type: item.type,
+//             key: item.key,
+//             url: '/api/favorites/attach?id=' + id + '&key=' + item.key
+//         };
+//         responseData.attachements.push(attachmentData);
 
-    });
-    return responseData;
-}
+//     });
+//     return responseData;
+// }
 
 function sanitizeInput(str) {
     return String(str).replace(/&(?!amp;|lt;|gt;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-var saveDocument = function(id, name, value, response) {
 
-    if (id === undefined) {
-        // Generated random id
-        id = '';
-    }
-
-    db.insert({
-        name: name,
-        value: value
-    }, id, function(err, doc) {
-        if (err) {
-            console.log(err);
-            response.sendStatus(500);
-        } else
-            response.sendStatus(200);
-        response.end();
-    });
-
-}
 
 app.get('/api/favorites/attach', function(request, response) {
     var doc = request.query.id;
@@ -268,27 +249,72 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 
 });
 
-app.post('/api/favorites', function(request, response) {
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+var saveRegionInfo = function(id, name, response) {
+
+    // if (id === undefined) {
+    //     // Generated random id
+    //     id = '';
+    // }
+
+    db.insert({
+        name: name,
+        injured: response.body.injured,
+        // the number of damaged buildings
+        building: response.body.building,
+        population: response.body.population,
+        rescue: response.body.rescue,
+        hospital: response.body.hospital,
+        needed: response.body.needed,
+        location: response.body.location
+
+    }, id, function(err, doc) {
+        if (err) {
+            console.log(err);
+            response.sendStatus(500);
+        } else
+            response.sendStatus(200);
+        response.end();
+    });
+
+}
+
+
+
+
+app.post('/api/regions', function(request, response) {
 
     console.log("Create Invoked..");
+    console.log("ID: " + request.body.id);
     console.log("Name: " + request.body.name);
-    console.log("Value: " + request.body.value);
 
     // var id = request.body.id;
+    var id = sanitizeInput(request.body.id);
     var name = sanitizeInput(request.body.name);
-    var value = sanitizeInput(request.body.value);
 
-    saveDocument(null, name, value, response);
+    saveRegionInfo(id, name, response);
 
 });
 
-app.delete('/api/favorites', function(request, response) {
+
+
+
+
+app.delete('/api/regions', function(request, response) {
 
     console.log("Delete Invoked..");
     var id = request.query.id;
     // var rev = request.query.rev; // Rev can be fetched from request. if
     // needed, send the rev from client
-    console.log("Removing document of ID: " + id);
+    console.log("Removing region of id: " + id);
     console.log('Request Query: ' + JSON.stringify(request.query));
 
     db.get(id, {
@@ -309,13 +335,23 @@ app.delete('/api/favorites', function(request, response) {
 
 });
 
-app.put('/api/favorites', function(request, response) {
+
+
+
+app.put('/api/regions', function(request, response) {
 
     console.log("Update Invoked..");
 
     var id = request.body.id;
     var name = sanitizeInput(request.body.name);
-    var value = sanitizeInput(request.body.value);
+    var injured = response.body.injured;
+        // the number of damaged buildings
+    var building= response.body.building;
+    var population = response.body.population;
+    var rescue = response.body.rescue;
+    var hospital= response.body.hospital;
+    var needed= response.body.needed;
+    var location =  response.body.location;
 
     console.log("ID: " + id);
 
@@ -325,7 +361,14 @@ app.put('/api/favorites', function(request, response) {
         if (!err) {
             console.log(doc);
             doc.name = name;
-            doc.value = value;
+            doc.injured = value;
+            doc.building = building;
+            doc.population = population;
+            doc.rescue = rescue;
+            doc.hospital = hospital;
+            doc.needed = needed;
+            doc.location = location;
+
             db.insert(doc, doc.id, function(err, doc) {
                 if (err) {
                     console.log('Error inserting data\n' + err);
@@ -337,42 +380,75 @@ app.put('/api/favorites', function(request, response) {
     });
 });
 
-app.get('/api/favorites', function(request, response) {
+
+
+
+function createResponseData(doc) {
+
+                        var responseData = createResponseData(
+                            doc.id,
+                            doc.name,
+                            doc.injured,
+                            doc.building, 
+                            doc.population, 
+                            doc.rescue, 
+                            doc.hospital, 
+                            doc.needed,
+                            doc.location);
+ return responseData;
+}
+
+
+app.get('/api/regions', function(request, response) {
 
     console.log("Get method invoked.. ")
 
     db = cloudant.use(dbCredentials.dbName);
-    var docList = [];
+    var regionList = [];
     var i = 0;
     db.list(function(err, body) {
+
         if (!err) {
             var len = body.rows.length;
-            console.log('total # of docs -> ' + len);
+            console.log('total # of regions -> ' + len);
             if (len == 0) {
                 // push sample data
                 // save doc
-                var docName = 'sample_doc';
-                var docDesc = 'A sample Document';
+                var regionName = 'sample_region';
+                var injured = 0;
+                var building = 0;
+                var population = 0;
+                var rescue = 0;
+                var hospital = 0;
+                var needed = 0;
+                var location = [];
+
                 db.insert({
-                    name: docName,
-                    value: 'A sample Document'
+                    name: regionName,
+                    injured: injured,
+                    // the number of damaged buildings
+                    building: building,
+                    population: population,
+                    rescue: rescue,
+                    hospital: hospital,
+                    needed: needed,
+                    location: location
                 }, '', function(err, doc) {
                     if (err) {
                         console.log(err);
                     } else {
 
-                        console.log('Document : ' + JSON.stringify(doc));
-                        var responseData = createResponseData(
-                            doc.id,
-                            docName,
-                            docDesc, []);
-                        docList.push(responseData);
-                        response.write(JSON.stringify(docList));
-                        console.log(JSON.stringify(docList));
+                        console.log('Region : ' + JSON.stringify(doc));
+                        var responseData = createResponseData(doc);
+
+                        regionList.push(responseData);
+                        response.write(JSON.stringify(regionList));
+                        console.log(JSON.stringify(regionList));
                         console.log('ending response...');
                         response.end();
                     }
                 });
+
             } else {
 
                 body.rows.forEach(function(document) {
@@ -381,36 +457,14 @@ app.get('/api/favorites', function(request, response) {
                         revs_info: true
                     }, function(err, doc) {
                         if (!err) {
-                            if (doc['_attachments']) {
+                           
 
-                                var attachments = [];
-                                for (var attribute in doc['_attachments']) {
+                        var responseData = createResponseData(doc);
 
-                                    if (doc['_attachments'][attribute] && doc['_attachments'][attribute]['content_type']) {
-                                        attachments.push({
-                                            "key": attribute,
-                                            "type": doc['_attachments'][attribute]['content_type']
-                                        });
-                                    }
-                                    console.log(attribute + ": " + JSON.stringify(doc['_attachments'][attribute]));
-                                }
-                                var responseData = createResponseData(
-                                    doc._id,
-                                    doc.name,
-                                    doc.value,
-                                    attachments);
-
-                            } else {
-                                var responseData = createResponseData(
-                                    doc._id,
-                                    doc.name,
-                                    doc.value, []);
-                            }
-
-                            docList.push(responseData);
+                            regionList.push(responseData);
                             i++;
                             if (i >= len) {
-                                response.write(JSON.stringify(docList));
+                                response.write(JSON.stringify(regionList));
                                 console.log('ending response...');
                                 response.end();
                             }
@@ -428,6 +482,8 @@ app.get('/api/favorites', function(request, response) {
     });
 
 });
+
+
 
 
 http.createServer(app).listen(app.get('port'), '0.0.0.0', function() {
