@@ -15,119 +15,124 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
-import {
-  withScriptjs,
-  withGoogleMap,
-  GoogleMap,
-  Marker
-} from "react-google-maps";
+import React, { Component } from "react";
+import Map from "./Map";
 
-const CustomSkinMap = withScriptjs(
-  withGoogleMap(() => (
-    <GoogleMap
-      defaultZoom={13}
-      defaultCenter={{ lat: -37.8102, lng: 144.9628 }}
-      defaultOptions={{
-        scrollwheel: false,
-        zoomControl: true,
-        streetViewControl: false,
-        styles: [
-      {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
-      {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
-      {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
-      {
-        featureType: 'administrative.locality',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#d59563'}]
-      },
-      {
-        featureType: 'poi',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#d59563'}]
-      },
-      {
-        featureType: 'poi.park',
-        elementType: 'geometry',
-        stylers: [{color: '#263c3f'}]
-      },
-      {
-        featureType: 'poi.park',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#6b9a76'}]
-      },
-      {
-        featureType: 'road',
-        elementType: 'geometry',
-        stylers: [{color: '#38414e'}]
-      },
-      {
-        featureType: 'road',
-        elementType: 'geometry.stroke',
-        stylers: [{color: '#212a37'}]
-      },
-      {
-        featureType: 'road',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#9ca5b3'}]
-      },
-      {
-        featureType: 'road.highway',
-        elementType: 'geometry',
-        stylers: [{color: '#746855'}]
-      },
-      {
-        featureType: 'road.highway',
-        elementType: 'geometry.stroke',
-        stylers: [{color: '#1f2835'}]
-      },
-      {
-        featureType: 'road.highway',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#f3d19c'}]
-      },
-      {
-        featureType: 'transit',
-        elementType: 'geometry',
-        stylers: [{color: '#2f3948'}]
-      },
-      {
-        featureType: 'transit.station',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#d59563'}]
-      },
-      {
-        featureType: 'water',
-        elementType: 'geometry',
-        stylers: [{color: '#17263c'}]
-      },
-      {
-        featureType: 'water',
-        elementType: 'labels.text.fill',
-        stylers: [{color: '#515c6d'}]
-      },
-      {
-        featureType: 'water',
-        elementType: 'labels.text.stroke',
-        stylers: [{color: '#17263c'}]
-      }
-    ]
-      }}
-    >
-      <Marker position={{ lat: 40.748817, lng: -73.985428 }} />
-    </GoogleMap>
-  ))
-);
 
-function Maps() {
-  return (
-    <CustomSkinMap
-      googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdP-osQdkefm_kKz77-S_uTjf1aXQZHkM"
-      loadingElement={<div style={{ height: `100%` }} />}
-      containerElement={<div style={{ height: `100vh` }} />}
-      mapElement={<div style={{ height: `100%` }} />}
-    />
-  );
+class Maps extends Component {
+
+  render() {
+    return (
+      <Map
+        id="myMap"
+        options={{
+          center: this.props.center,
+          zoom: 11,
+          scrollwheel: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: false,
+          styles: [
+            {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+            {
+              featureType: 'administrative.locality',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{'visibility': 'off'}]
+            },
+            {
+              featureType: 'transit',
+              elementType: 'labels',
+              stylers: [{'visibility': 'off'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'all',
+              stylers: [{'visibility': 'off'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{color: '#17263c'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#515c6d'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.stroke',
+              stylers: [{color: '#17263c'}]
+            }
+          ]
+        }}
+        onMapLoad={map => {
+          map.data.loadGeoJson('https://data.gov.au/geoserver/vic-suburb-locality-boundaries-psma-administrative-boundaries/wfs?request=GetFeature&typeName=ckan_af33dd8c_0534_4e18_9245_fc64440f742e&outputFormat=json');
+          // (feature) => {
+            
+          // })
+          console.log(this.props)
+          // const data = [];
+          map.data.setStyle((feature) => {
+          //   let name = feature.getProperty('vic_loca_2');
+          //   // console.log(name);
+          //   data.push(name);
+          //   let total = Math.floor(Math.random() * Math.floor(20000));
+          //   let colors = this.gradient('#ffffff','#ff9900',6);
+          //   let color = '#000000'
+          //   if (total > 1)
+          //     color = colors[0]
+          //   if (total > 4000)
+          //     color = colors[1]
+          //   if (total > 8000)
+          //     color = colors[2]
+          //   if (total > 12000)
+          //     color = colors[3]
+          //   if (total > 16000)
+          //     color = colors[4]
+          //   if (total > 20000)
+          //     color = colors[5]
+            return {
+              fillColor: this.props.colors[Math.floor(Math.random() * Math.floor(11))],
+              fillOpacity: 0.7,
+              strokeWeight: 1
+            }
+          })
+          // setTimeout(() => {
+          //   this.download(data, 'suburbs', 'application/json');
+          // }, 60000);
+        }}
+      ></Map>
+    );
+  }
+
+  // download(data, filename, type) {
+  //   var file = new Blob([data], {type: type});
+  //   if (window.navigator.msSaveOrOpenBlob) // IE10+
+  //       window.navigator.msSaveOrOpenBlob(file, filename);
+  //   else { // Others
+  //       var a = document.createElement("a"),
+  //               url = URL.createObjectURL(file);
+  //       a.href = url;
+  //       a.download = filename;
+  //       document.body.appendChild(a);
+  //       a.click();
+  //       setTimeout(function() {
+  //           document.body.removeChild(a);
+  //           window.URL.revokeObjectURL(url);  
+  //       }, 0); 
+  //   }
+  //  }
 }
 
 export default Maps;

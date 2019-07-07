@@ -30,7 +30,7 @@ import UserProfile from "views/UserProfile/UserProfile.jsx";
 import TableList from "views/TableList/TableList.jsx";
 import Typography from "views/Typography/Typography.jsx";
 import Icons from "views/Icons/Icons.jsx";
-import Maps from "views/Maps/Maps.jsx";
+import MapWindow from "views/Maps/MapWindow.jsx";
 import NotificationsPage from "views/Notifications/Notifications.jsx";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.jsx";
 // core components/views for RTL layout
@@ -79,10 +79,10 @@ const dashboardRoutes = [
   },
   {
     path: "/maps",
-    name: "Maps",
+    name: "MapWindow",
     rtlName: "خرائط",
     icon: LocationOn,
-    component: Maps,
+    component: MapWindow,
     layout: "/admin"
   },
   {
