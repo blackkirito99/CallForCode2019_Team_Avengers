@@ -3,17 +3,20 @@
   "version": "0.0.2",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "ngrok": "ngrok http 3000"
   },
   "dependencies": {
     "body-parser": "1.17.x",
     "cloudant": "1.7.x",
     "connect-multiparty": "2.0.x",
+    "cors": "^2.8.5",
     "ejs": "2.5.x",
     "errorhandler": "1.5.x",
     "express": "4.15.x",
     "method-override": "2.3.x",
     "morgan": "1.8.x",
+    "ngrok": "^3.2.1",
     "nodemon": "^1.19.1"
   },
   "repository": {},
