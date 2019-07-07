@@ -7,10 +7,7 @@ var express = require('express'),
   user = require('./routes/user'),
   http = require('http'),
   path = require('path'),
-<<<<<<< HEAD
   cors = require('cors'),
-=======
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
   fs = require('fs');
 
 var app = express();
@@ -105,7 +102,6 @@ initDBConnection();
 
 app.get('/', routes.index);
 
-<<<<<<< HEAD
 function sanitizeInput(str) {
   return String(str)
     .replace(/&(?!amp;|lt;|gt;)/g, '&amp;')
@@ -114,88 +110,20 @@ function sanitizeInput(str) {
 }
 
 var saveNGODocument = function(id, name, amount, response) {
-=======
-// function createResponseData(id, name, value, attachments) {
-
-//     var responseData = {
-//         id: id,
-//         name: sanitizeInput(name),
-//         value: sanitizeInput(value),
-//         attachements: []
-//     };
-
-
-//     attachments.forEach(function(item, index) {
-//         var attachmentData = {
-//             content_type: item.type,
-//             key: item.key,
-//             url: '/api/favorites/attach?id=' + id + '&key=' + item.key
-//         };
-//         responseData.attachements.push(attachmentData);
-
-//     });
-//     return responseData;
-// }
-// function createNGO(ngoId, ngoName, ngoAmount) {
-//   return {
-//     ngoId: sanitizeInput(ngoId),
-//     ngoName: sanitizeInput(ngoName),
-//     ngoAmount: sanitizeInput(ngoAmount)
-//   };
-// }
-
-function createResponseData(id, name, value, attachments) {
-  var responseData = {
-    id: id,
-    name: sanitizeInput(name),
-    value: sanitizeInput(value),
-    attachements: []
-  };
-
-  attachments.forEach(function(item, index) {
-    var attachmentData = {
-      content_type: item.type,
-      key: item.key,
-      url: '/api/favorites/attach?id=' + id + '&key=' + item.key
-    };
-    responseData.attachements.push(attachmentData);
-  });
-  return responseData;
-}
-
-function sanitizeInput(str) {
-  return String(str)
-    .replace(/&(?!amp;|lt;|gt;)/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-
-var saveDocument = function(id, name, value, response) {
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
   if (id === undefined) {
     // Generated random id
     id = '';
   }
-<<<<<<< HEAD
   db.insert(
     {
       ngoName: name,
       ngoAmount: amount
-=======
-
-  db.insert(
-    {
-      name: name,
-      value: value
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
     },
     id,
     function(err, doc) {
       if (err) {
         console.log(err);
         response.sendStatus(500);
-<<<<<<< HEAD
       } else {
         response.sendStatus(200);
         response.end();
@@ -214,41 +142,6 @@ app.post('/api/ngo', function(req, res) {
   var name = sanitizeInput(req.body.ngoName);
   var amount = sanitizeInput(req.body.ngoAmount);
   saveNGODocument(null, name, amount, res);
-=======
-      } else response.sendStatus(200);
-      response.end();
-    }
-  );
-};
-
-// app.post('/api/ngo', function(req, res) {
-//   db.insert({});
-// });
-
-// app.get('/api/ngo', function(req, res) {
-//   res.send('api ngo');
-// });
-
-app.get('/api/favorites/attach', function(request, response) {
-  var doc = request.query.id;
-  var key = request.query.key;
-
-  db.attachment.get(doc, key, function(err, body) {
-    if (err) {
-      response.status(500);
-      response.setHeader('Content-Type', 'text/plain');
-      response.write('Error: ' + err);
-      response.end();
-      return;
-    }
-
-    response.status(200);
-    response.setHeader('Content-Disposition', 'inline; filename="' + key + '"');
-    response.write(body);
-    response.end();
-    return;
-  });
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
 });
 
 // NGO delete
@@ -398,56 +291,11 @@ app.post('/api/regions', function(request, response) {
   console.log('ID: ' + request.body.id);
   console.log('Name: ' + request.body.name);
 
-<<<<<<< HEAD
   // var id = request.body.id;
   var id = request.body.id;
   var name = sanitizeInput(request.body.name);
 
   saveRegionInfo(id, name, request, response);
-=======
-    console.log("Create Invoked..");
-    console.log("ID: " + request.body.id);
-    console.log("Name: " + request.body.name);
-
-    // var id = request.body.id;
-    var id = sanitizeInput(request.body.id);
-    var name = sanitizeInput(request.body.name);
-
-    saveRegionInfo(id, name, response);
-var saveNGODocument = function(id, name, amount, response) {
-  if (id === undefined) {
-    // Generated random id
-    id = '';
-  }
-  db.insert(
-    {
-      ngoName: name,
-      ngoAmount: amount
-    },
-    id,
-    function(err, doc) {
-      if (err) {
-        console.log(err);
-        response.sendStatus(500);
-      } else {
-        response.sendStatus(200);
-        response.end();
-      }
-    }
-  );
-};
-
-// ngo post
-app.post('/api/ngo', function(req, res) {
-  console.log('Create Invoked..');
-  console.log('Name: ' + req.body.ngoName);
-  console.log('Value: ' + req.body.ngoAmount);
-  //   console.log('Id: ' + req.query.id);
-  //   var id = req.body.id;
-  var name = sanitizeInput(req.body.ngoName);
-  var amount = sanitizeInput(req.body.ngoAmount);
-  saveNGODocument(null, name, amount, res);
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
 });
 
 app.delete('/api/regions/:id', function(request, response) {
@@ -730,7 +578,6 @@ app.get('/api/regions/transaction', function(request, response) {
                   regionList.push(data);
                 }
 
-<<<<<<< HEAD
                 i++;
                 if (i >= len) {
                   response.write(JSON.stringify(transactionList));
@@ -746,506 +593,10 @@ app.get('/api/regions/transaction', function(request, response) {
       }
     } else {
       console.log(err);
-=======
-    console.log("Get all transactions.. ")
-
-    db = cloudant.use(dbCredentials.dbName);
-    var transactionList = [];
-    var i = 0;
-    db.list(function(err, body) {
-
-        if (!err) {
-            var len = body.rows.length;
-            console.log('total # of transactions -> ' + len);
-            if (len == 0) {
-                // push sample data
-                // save doc
-
-                var regionid = 0;
-                var regionName = "sample_region";
-                var institutionid = 0;
-                var institutionName = "sample_institution";
-                var amount = 0;
-
-                db.insert({
-                        region: regionid
-                        regionName: regionName,
-                        institution: institutionid,
-                        institutionName: institutionName,
-                        amount: amount
-                }, '', function(err, doc) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-
-                        console.log('Region : ' + JSON.stringify(doc));
-                        var responseData = createResponse(doc);
-
-                        transactionList.push(responseData);
-                        response.write(JSON.stringify(transactionList));
-                        console.log(JSON.stringify(transactionList));
-                        console.log('ending response...');
-                        response.end();
-                    }
-                });
-
-            } else {
-
-                body.rows.forEach(function(document) {
-
-                    db.get(document.id, {
-                        revs_info: true
-                    }, function(err, doc) {
-                        if (!err) {
-                           
-
-                        var responseData = createResponse(doc);
-
-                            transactionList.push(responseData);
-                            i++;
-                            if (i >= len) {
-                                response.write(JSON.stringify(transactionList));
-                                console.log('ending response...');
-                                response.end();
-                            }
-                        } else {
-                            console.log(err);
-                        }
-                    });
-
-                });
-// app.post('/api/favorites/attach', multipartMiddleware, function(
-//   request,
-//   response
-// ) {
-//   console.log('Upload File Invoked..');
-//   console.log('Request: ' + JSON.stringify(request.headers));
-
-//   var id;
-
-//   db.get(request.query.id, function(err, existingdoc) {
-//     var isExistingDoc = false;
-//     if (!existingdoc) {
-//       id = '-1';
-//     } else {
-//       id = existingdoc.id;
-//       isExistingDoc = true;
-//     }
-
-//     var name = sanitizeInput(request.query.name);
-//     var value = sanitizeInput(request.query.value);
-
-//     var file = request.files.file;
-//     var newPath = './public/uploads/' + file.name;
-
-//     var insertAttachment = function(file, id, rev, name, value, response) {
-//       fs.readFile(file.path, function(err, data) {
-//         if (!err) {
-//           if (file) {
-//             db.attachment.insert(
-//               id,
-//               file.name,
-//               data,
-//               file.type,
-//               {
-//                 rev: rev
-//               },
-//               function(err, document) {
-//                 if (!err) {
-//                   console.log('Attachment saved successfully.. ');
-
-//                   db.get(document.id, function(err, doc) {
-//                     console.log(
-//                       'Attachements from server --> ' +
-//                         JSON.stringify(doc._attachments)
-//                     );
-
-//                     var attachements = [];
-//                     var attachData;
-//                     for (var attachment in doc._attachments) {
-//                       if (attachment == value) {
-//                         attachData = {
-//                           key: attachment,
-//                           type: file.type
-//                         };
-//                       } else {
-//                         attachData = {
-//                           key: attachment,
-//                           type: doc._attachments[attachment]['content_type']
-//                         };
-//                       }
-//                       attachements.push(attachData);
-//                     }
-//                     var responseData = createResponseData(
-//                       id,
-//                       name,
-//                       value,
-//                       attachements
-//                     );
-//                     console.log(
-//                       'Response after attachment: \n' +
-//                         JSON.stringify(responseData)
-//                     );
-//                     response.write(JSON.stringify(responseData));
-//                     response.end();
-//                     return;
-//                   });
-//                 } else {
-//                   console.log(err);
-//                 }
-//               }
-//             );
-//           }
-//         }
-//       });
-//     };
-
-//     if (!isExistingDoc) {
-//       existingdoc = {
-//         name: name,
-//         value: value,
-//         create_date: new Date()
-//       };
-
-//       // save doc
-//       db.insert(
-//         {
-//           name: name,
-//           value: value
-//         },
-//         '',
-//         function(err, doc) {
-//           if (err) {
-//             console.log(err);
-//           } else {
-//             existingdoc = doc;
-//             console.log('New doc created ..');
-//             console.log(existingdoc);
-//             insertAttachment(
-//               file,
-//               existingdoc.id,
-//               existingdoc.rev,
-//               name,
-//               value,
-//               response
-//             );
-//           }
-//         }
-//       );
-//     } else {
-//       console.log('Adding attachment to existing doc.');
-//       console.log(existingdoc);
-//       insertAttachment(
-//         file,
-//         existingdoc._id,
-//         existingdoc._rev,
-//         name,
-//         value,
-//         response
-//       );
-//     }
-//   });
-// });
-
-// app.post('/api/favorites', function(request, response) {
-//   console.log('Create Invoked..');
-//   console.log('Name: ' + request.body.name);
-//   console.log('Value: ' + request.body.value);
-
-//   // var id = request.body.id;
-//   var name = sanitizeInput(request.body.name);
-//   var value = sanitizeInput(request.body.value);
-
-//   saveDocument(null, name, value, response);
-// });
-
-// NGO delete
-app.delete('/api/ngo/:id', function(req, res) {
-  console.log('Delete NGO!!..');
-  var id = request.params.id;
-
-  db.get(
-    id,
-    {
-      revs_info: true
-    },
-    function(err, doc) {
-      if (!err) {
-        db.destroy(doc._id, doc._rev, function(err, res) {
-          // Handle response
-          if (err) {
-            console.log(err);
-            response.sendStatus(500);
-          } else {
-            response.sendStatus(200);
-          }
-        });
-      }
-    }
-  );
-});
-
-// app.delete('/api/favorites', function(request, response) {
-//   console.log('Delete Invoked..');
-//   var id = request.query.id;
-//   // var rev = request.query.rev; // Rev can be fetched from request. if
-//   // needed, send the rev from client
-//   console.log('Removing document of ID: ' + id);
-//   console.log('Request Query: ' + JSON.stringify(request.query));
-
-//   db.get(
-//     id,
-//     {
-//       revs_info: true
-//     },
-//     function(err, doc) {
-//       if (!err) {
-//         db.destroy(doc._id, doc._rev, function(err, res) {
-//           // Handle response
-//           if (err) {
-//             console.log(err);
-//             response.sendStatus(500);
-//           } else {
-//             response.sendStatus(200);
-//           }
-//         });
-//       }
-//     }
-//   );
-// });
-
-// UPDATE NGO!!
-app.put('/api/ngo/:id', function(req, res) {
-  console.log('Update NGO!!');
-  var id = req.params.id;
-  var ngoAmount = sanitizeInput(req.body.ngoAmount);
-
-  db.get(
-    id,
-    {
-      revs_info: true
-    },
-    function(err, founddoc) {
-      if (!err) {
-        console.log(founddoc);
-        var needToUpdateDoc = {
-          _id: founddoc._id,
-          _rev: founddoc._rev,
-          amount: ngoAmount
-        };
-        db.insert(needToUpdateDoc, function(err, doc) {
-          if (err) {
-            console.log('Error inserting data\n' + err);
-            return 500;
-          } else {
-            console.log(doc);
-            res.status(200);
-            res.write(JSON.stringify(doc));
-            res.end();
-          }
-        });
-      }
-    }
-  );
-});
-
-// app.put('/api/favorites', function(request, response) {
-//   console.log('Update Invoked..');
-
-//   var id = request.body.id;
-//   var name = sanitizeInput(request.body.name);
-//   var value = sanitizeInput(request.body.value);
-
-//   console.log('ID: ' + id);
-
-//   db.get(
-//     id,
-//     {
-//       revs_info: true
-//     },
-//     function(err, doc) {
-//       if (!err) {
-//         console.log(doc);
-//         doc.name = name;
-//         doc.value = value;
-//         db.insert(doc, doc.id, function(err, doc) {
-//           if (err) {
-//             console.log('Error inserting data\n' + err);
-//             return 500;
-//           }
-//           return 200;
-//         });
-//       }
-//     }
-//   );
-// });
-
-// GET one NGO
-app.get('/api/ngo/:id', function(req, res) {
-  db = cloudant.use(dbCredentials.dbName);
-  var id = req.params.id;
-  db.get(id, { revs_info: true }, function(err, doc) {
-    console.log(doc);
-    res.write(JSON.stringify(doc));
-    res.end();
-  });
-});
-
-//GET ALL NGOs
-app.get('/api/ngo', function(req, res) {
-  console.log('Get ngo invoked!');
-  db = cloudant.use(dbCredentials.dbName);
-  db.list(function(err, body) {
-    if (!err) {
-      var len = body.rows.length;
-      var docList = [];
-      var i = 0;
-      body.rows.forEach(function(document) {
-        db.get(
-          document.id,
-          {
-            revs_info: true
-          },
-          function(err, doc) {
-            if (!err) {
-              if (doc['ngoName'] && doc['ngoAmount']) {
-                var data = {
-                  ngoName: doc['ngoName'],
-                  ngoAmount: doc['ngoAmount']
-                };
-                docList.push(data);
-              }
-              i++;
-              if (i >= len) {
-                console.log(docList);
-                res.write(JSON.stringify(docList));
-                res.end();
-              }
-            } else {
-              console.log(err);
-            }
-          }
-        );
-      });
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
     }
   });
 });
 
-<<<<<<< HEAD
-=======
-// app.get('/api/favorites', function(request, response) {
-//   console.log('Get method invoked.. ');
-
-//   db = cloudant.use(dbCredentials.dbName);
-//   var docList = [];
-//   var i = 0;
-//   db.list(function(err, body) {
-//     if (!err) {
-//       var len = body.rows.length;
-//       console.log('total # of docs -> ' + len);
-//       if (len == 0) {
-//         // push sample data
-//         // save doc
-//         var docName = 'sample_doc';
-//         var docDesc = 'A sample Document';
-//         db.insert(
-//           {
-//             name: docName,
-//             value: 'A sample Document'
-//           },
-//           '',
-//           function(err, doc) {
-//             if (err) {
-//               console.log(err);
-//             } else {
-//               console.log('Document : ' + JSON.stringify(doc));
-//               var responseData = createResponseData(
-//                 doc.id,
-//                 docName,
-//                 docDesc,
-//                 []
-//               );
-//               docList.push(responseData);
-//               response.write(JSON.stringify(docList));
-//               console.log(JSON.stringify(docList));
-//               console.log('ending response...');
-//               response.end();
-//             }
-//           }
-//         );
-//       } else {
-//         body.rows.forEach(function(document) {
-//           db.get(
-//             document.id,
-//             {
-//               revs_info: true
-//             },
-//             function(err, doc) {
-//               if (!err) {
-//                 if (doc['_attachments']) {
-//                   var attachments = [];
-//                   for (var attribute in doc['_attachments']) {
-//                     if (
-//                       doc['_attachments'][attribute] &&
-//                       doc['_attachments'][attribute]['content_type']
-//                     ) {
-//                       attachments.push({
-//                         key: attribute,
-//                         type: doc['_attachments'][attribute]['content_type']
-//                       });
-//                     }
-//                     console.log(
-//                       attribute +
-//                         ': ' +
-//                         JSON.stringify(doc['_attachments'][attribute])
-//                     );
-//                   }
-//                   var responseData = createResponseData(
-//                     doc._id,
-//                     doc.name,
-//                     doc.value,
-//                     attachments
-//                   );
-//                 } else {
-//                   var responseData = createResponseData(
-//                     doc._id,
-//                     doc.name,
-//                     doc.value,
-//                     []
-//                   );
-//                 }
-
-//                 docList.push(responseData);
-//                 i++;
-//                 if (i >= len) {
-//                   response.write(JSON.stringify(docList));
-//                   console.log('ending response...');
-//                   response.end();
-//                 }
-//               } else {
-//                 console.log(err);
-//               }
-//             }
-//           );
-//         });
-//       }
-//     } else {
-//       console.log(err);
-//     }
-//   });
-// });
-
-
-
-
-
-
-
-
-
-
->>>>>>> 22c18f05db1e3aac2787195a28654a0024d697bf
 http.createServer(app).listen(app.get('port'), '0.0.0.0', function() {
   console.log('Express server listening on port ' + app.get('port'));
 });
