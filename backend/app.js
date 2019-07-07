@@ -257,7 +257,7 @@ app.get('/api/ngo', function(req, res) {
   });
 });
 
-var saveRegionInfo = function(id, name, response) {
+var saveRegionInfo = function(id, name, request, response) {
   // if (id === undefined) {
   //     // Generated random id
   //     id = '';
@@ -266,14 +266,14 @@ var saveRegionInfo = function(id, name, response) {
   db.insert(
     {
       name: name,
-      injured: response.body.injured,
+      injured: request.body.injured,
       // the number of damaged buildings
-      building: response.body.building,
-      population: response.body.population,
-      rescue: response.body.rescue,
-      hospital: response.body.hospital,
-      needed: response.body.needed,
-      location: response.body.location
+      building: request.body.building,
+      population: request.body.population,
+      rescue: request.body.rescue,
+      hospital: request.body.hospital,
+      needed: request.body.needed,
+      location: request.body.location
     },
     id,
     function(err, doc) {
@@ -292,19 +292,18 @@ app.post('/api/regions', function(request, response) {
   console.log('Name: ' + request.body.name);
 
   // var id = request.body.id;
-  var id = sanitizeInput(request.body.id);
+  var id = request.body.id;
   var name = sanitizeInput(request.body.name);
 
-  saveRegionInfo(id, name, response);
+  saveRegionInfo(id, name, request, response);
 });
 
-app.delete('/api/regions', function(request, response) {
+app.delete('/api/regions/:id', function(request, response) {
   console.log('Delete Invoked..');
-  var id = request.query.id;
+  var id = request.params.id;
   // var rev = request.query.rev; // Rev can be fetched from request. if
   // needed, send the rev from client
   console.log('Removing region of id: ' + id);
-  console.log('Request Query: ' + JSON.stringify(request.query));
 
   db.get(
     id,
@@ -331,17 +330,17 @@ app.put('/api/regions', function(request, response) {
   console.log('Update Invoked..');
 
   var id = request.body.id;
-  var name = sanitizeInput(request.body.name);
-  var injured = response.body.injured;
+  var name = request.body.name;
+  var injured = request.body.injured;
   // the number of damaged buildings
-  var building = response.body.building;
-  var population = response.body.population;
-  var rescue = response.body.rescue;
-  var hospital = response.body.hospital;
-  var needed = response.body.needed;
-  var location = response.body.location;
+  var building = request.body.building;
+  var population = request.body.population;
+  var rescue = request.body.rescue;
+  var hospital = request.body.hospital;
+  var needed = request.body.needed;
+  var location = request.body.location;
 
-  console.log('ID: ' + id);
+  console.log('Update ID: ' + id);
 
   db.get(
     id,
@@ -352,7 +351,7 @@ app.put('/api/regions', function(request, response) {
       if (!err) {
         console.log(doc);
         doc.name = name;
-        doc.injured = value;
+        doc.injured = injured;
         doc.building = building;
         doc.population = population;
         doc.rescue = rescue;
@@ -364,8 +363,11 @@ app.put('/api/regions', function(request, response) {
           if (err) {
             console.log('Error inserting data\n' + err);
             return 500;
+          } else {
+            response.status(200);
+            response.write(JSON.stringify(doc));
+            response.end();
           }
-          return 200;
         });
       }
     }
@@ -387,7 +389,8 @@ app.get('/api/regions', function(request, response) {
         // save doc
 
         var data = {
-          regionName: 'sample_region',
+          id: 0,
+          name: 'sample_region',
           injured: 0,
           building: 0,
           population: 0,
@@ -414,6 +417,7 @@ app.get('/api/regions', function(request, response) {
             function(err, doc) {
               if (!err) {
                 if (
+                  doc['_id'] &&
                   doc['name'] &&
                   doc['injured'] &&
                   doc['building'] &&
@@ -424,7 +428,8 @@ app.get('/api/regions', function(request, response) {
                   doc['location']
                 ) {
                   var data = {
-                    regionName: doc['name'],
+                    id: doc['_id'],
+                    name: doc['name'],
                     injured: doc['injured'],
                     building: doc['building'],
                     population: doc['population'],
@@ -433,7 +438,6 @@ app.get('/api/regions', function(request, response) {
                     needed: doc['needed'],
                     location: doc['location']
                   };
-
                   regionList.push(data);
                 }
 
@@ -461,27 +465,29 @@ app.post('/api/regions/transaction', function(request, response) {
   console.log('To: ' + request.body.regionName);
   console.log('From: ' + request.body.institutionName);
 
-  saveTransactionInfo(response);
+  saveTransactionInfo(request, response);
 });
 
-var saveTransactionInfo = function(response) {
+var saveTransactionInfo = function(request, response) {
   id = '';
 
   db.insert(
     {
-      region: request.body.regionid,
+      regionId: request.body.regionid,
       regionName: request.body.regionName,
-      institution: request.body.institutionid,
+      institutionId: request.body.institutionid,
       institutionName: request.body.institutionName,
-      amount: response.body.amount
+      amount: request.body.amount
     },
     id,
     function(err, doc) {
       if (err) {
         console.log(err);
         response.sendStatus(500);
-      } else response.sendStatus(200);
-      response.end();
+      } else {
+        response.sendStatus(200);
+        response.end();
+      }
     }
   );
 };
@@ -553,7 +559,7 @@ app.get('/api/regions/transaction', function(request, response) {
             function(err, doc) {
               if (!err) {
                 if (
-                  doc['id'] &&
+                  doc['_id'] &&
                   doc['region'] &&
                   doc['regionName'] &&
                   doc['institution'] &&
@@ -561,7 +567,7 @@ app.get('/api/regions/transaction', function(request, response) {
                   doc['amount']
                 ) {
                   var data = {
-                    id: doc['id'],
+                    id: doc['_id'],
                     region: doc['region'],
                     regionName: doc['regionName'],
                     institution: doc['institution'],
