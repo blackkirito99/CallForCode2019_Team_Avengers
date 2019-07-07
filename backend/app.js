@@ -306,8 +306,6 @@ app.post('/api/regions', function(request, response) {
 
 
 
-
-
 app.delete('/api/regions', function(request, response) {
 
     console.log("Delete Invoked..");
@@ -482,6 +480,166 @@ app.get('/api/regions', function(request, response) {
     });
 
 });
+
+
+app.post('/api/regions/transaction', function(request, response) {
+
+    console.log("Transaction Invoked..");
+    console.log("To: " + request.body.regionName);
+    console.log("From: " + request.body.institutionName);
+
+    saveTransactionInfo(response);
+
+});
+
+var saveTransactionInfo = function(response) {
+
+    id = '';
+
+    db.insert({
+        region: request.body.regionid,
+        regionName: request.body.regionName,
+        institution: request.body.institutionid,
+        institutionName: request.body.institutionName,
+        amount: response.body.amount
+
+    }, id, function(err, doc) {
+        if (err) {
+            console.log(err);
+            response.sendStatus(500);
+        } else
+            response.sendStatus(200);
+        response.end();
+    });
+
+}
+
+
+app.delete('/api/regions/transaction', function(request, response) {
+
+    console.log("Delete Transaction..");
+    var id = request.query.id;
+    // var rev = request.query.rev; // Rev can be fetched from request. if
+    // needed, send the rev from client
+    console.log("Removing transaction of id: " + id);
+    console.log('Request Query: ' + JSON.stringify(request.query));
+
+    db.get(id, {
+        revs_info: true
+    }, function(err, doc) {
+        if (!err) {
+            db.destroy(doc._id, doc._rev, function(err, res) {
+                // Handle response
+                if (err) {
+                    console.log(err);
+                    response.sendStatus(500);
+                } else {
+                    response.sendStatus(200);
+                }
+            });
+        }
+    });
+
+});
+
+
+function createResponse(doc) {
+
+                        var responseData = {
+                        id: doc.id,
+                        region: doc.regionid,
+                        regionName: doc.regionName,
+                        institution: doc.institutionid,
+                        institutionName: doc.institutionName,
+                        amount: doc.amount }
+ return responseData;
+}
+
+
+app.get('/api/regions/transaction', function(request, response) {
+
+    console.log("Get all transactions.. ")
+
+    db = cloudant.use(dbCredentials.dbName);
+    var transactionList = [];
+    var i = 0;
+    db.list(function(err, body) {
+
+        if (!err) {
+            var len = body.rows.length;
+            console.log('total # of transactions -> ' + len);
+            if (len == 0) {
+                // push sample data
+                // save doc
+
+                var regionid = 0;
+                var regionName = "sample_region";
+                var institutionid = 0;
+                var institutionName = "sample_institution";
+                var amount = 0;
+
+                db.insert({
+                        region: regionid
+                        regionName: regionName,
+                        institution: institutionid,
+                        institutionName: institutionName,
+                        amount: amount
+                }, '', function(err, doc) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+
+                        console.log('Region : ' + JSON.stringify(doc));
+                        var responseData = createResponse(doc);
+
+                        transactionList.push(responseData);
+                        response.write(JSON.stringify(transactionList));
+                        console.log(JSON.stringify(transactionList));
+                        console.log('ending response...');
+                        response.end();
+                    }
+                });
+
+            } else {
+
+                body.rows.forEach(function(document) {
+
+                    db.get(document.id, {
+                        revs_info: true
+                    }, function(err, doc) {
+                        if (!err) {
+                           
+
+                        var responseData = createResponse(doc);
+
+                            transactionList.push(responseData);
+                            i++;
+                            if (i >= len) {
+                                response.write(JSON.stringify(transactionList));
+                                console.log('ending response...');
+                                response.end();
+                            }
+                        } else {
+                            console.log(err);
+                        }
+                    });
+
+                });
+            }
+
+        } else {
+            console.log(err);
+        }
+    });
+
+});
+
+
+
+
+
+
+
 
 
 
