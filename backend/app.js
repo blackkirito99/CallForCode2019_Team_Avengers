@@ -257,6 +257,340 @@ app.get('/api/ngo', function(req, res) {
   });
 });
 
+var saveRegionInfo = function(id, name, response) {
+  // if (id === undefined) {
+  //     // Generated random id
+  //     id = '';
+  // }
+
+  db.insert(
+    {
+      name: name,
+      injured: response.body.injured,
+      // the number of damaged buildings
+      building: response.body.building,
+      population: response.body.population,
+      rescue: response.body.rescue,
+      hospital: response.body.hospital,
+      needed: response.body.needed,
+      location: response.body.location
+    },
+    id,
+    function(err, doc) {
+      if (err) {
+        console.log(err);
+        response.sendStatus(500);
+      } else response.sendStatus(200);
+      response.end();
+    }
+  );
+};
+
+app.post('/api/regions', function(request, response) {
+  console.log('Create Invoked..');
+  console.log('ID: ' + request.body.id);
+  console.log('Name: ' + request.body.name);
+
+  // var id = request.body.id;
+  var id = sanitizeInput(request.body.id);
+  var name = sanitizeInput(request.body.name);
+
+  saveRegionInfo(id, name, response);
+});
+
+app.delete('/api/regions', function(request, response) {
+  console.log('Delete Invoked..');
+  var id = request.query.id;
+  // var rev = request.query.rev; // Rev can be fetched from request. if
+  // needed, send the rev from client
+  console.log('Removing region of id: ' + id);
+  console.log('Request Query: ' + JSON.stringify(request.query));
+
+  db.get(
+    id,
+    {
+      revs_info: true
+    },
+    function(err, doc) {
+      if (!err) {
+        db.destroy(doc._id, doc._rev, function(err, res) {
+          // Handle response
+          if (err) {
+            console.log(err);
+            response.sendStatus(500);
+          } else {
+            response.sendStatus(200);
+          }
+        });
+      }
+    }
+  );
+});
+
+app.put('/api/regions', function(request, response) {
+  console.log('Update Invoked..');
+
+  var id = request.body.id;
+  var name = sanitizeInput(request.body.name);
+  var injured = response.body.injured;
+  // the number of damaged buildings
+  var building = response.body.building;
+  var population = response.body.population;
+  var rescue = response.body.rescue;
+  var hospital = response.body.hospital;
+  var needed = response.body.needed;
+  var location = response.body.location;
+
+  console.log('ID: ' + id);
+
+  db.get(
+    id,
+    {
+      revs_info: true
+    },
+    function(err, doc) {
+      if (!err) {
+        console.log(doc);
+        doc.name = name;
+        doc.injured = value;
+        doc.building = building;
+        doc.population = population;
+        doc.rescue = rescue;
+        doc.hospital = hospital;
+        doc.needed = needed;
+        doc.location = location;
+
+        db.insert(doc, doc.id, function(err, doc) {
+          if (err) {
+            console.log('Error inserting data\n' + err);
+            return 500;
+          }
+          return 200;
+        });
+      }
+    }
+  );
+});
+
+app.get('/api/regions', function(request, response) {
+  console.log('Get method invoked.. ');
+
+  db = cloudant.use(dbCredentials.dbName);
+  var regionList = [];
+  var i = 0;
+  db.list(function(err, body) {
+    if (!err) {
+      var len = body.rows.length;
+      console.log('total # of regions -> ' + len);
+      if (len == 0) {
+        // push sample data
+        // save doc
+
+        var data = {
+          regionName: 'sample_region',
+          injured: 0,
+          building: 0,
+          population: 0,
+          rescue: 0,
+          hospital: 0,
+          needed: 0,
+          location: [0, 0]
+        };
+
+        console.log('No region exists');
+
+        regionList.push(data);
+        response.write(JSON.stringify(regionList));
+        console.log(JSON.stringify(regionList));
+        console.log('ending response...');
+        response.end();
+      } else {
+        body.rows.forEach(function(document) {
+          db.get(
+            document.id,
+            {
+              revs_info: true
+            },
+            function(err, doc) {
+              if (!err) {
+                if (
+                  doc['name'] &&
+                  doc['injured'] &&
+                  doc['building'] &&
+                  doc['population'] &&
+                  doc['rescue'] &&
+                  doc['hospital'] &&
+                  doc['needed'] &&
+                  doc['location']
+                ) {
+                  var data = {
+                    regionName: doc['name'],
+                    injured: doc['injured'],
+                    building: doc['building'],
+                    population: doc['population'],
+                    rescue: doc['rescue'],
+                    hospital: doc['hospital'],
+                    needed: doc['needed'],
+                    location: doc['location']
+                  };
+
+                  regionList.push(data);
+                }
+
+                i++;
+                if (i >= len) {
+                  response.write(JSON.stringify(regionList));
+                  console.log('ending response...');
+                  response.end();
+                }
+              } else {
+                console.log(err);
+              }
+            }
+          );
+        });
+      }
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+app.post('/api/regions/transaction', function(request, response) {
+  console.log('Transaction Invoked..');
+  console.log('To: ' + request.body.regionName);
+  console.log('From: ' + request.body.institutionName);
+
+  saveTransactionInfo(response);
+});
+
+var saveTransactionInfo = function(response) {
+  id = '';
+
+  db.insert(
+    {
+      region: request.body.regionid,
+      regionName: request.body.regionName,
+      institution: request.body.institutionid,
+      institutionName: request.body.institutionName,
+      amount: response.body.amount
+    },
+    id,
+    function(err, doc) {
+      if (err) {
+        console.log(err);
+        response.sendStatus(500);
+      } else response.sendStatus(200);
+      response.end();
+    }
+  );
+};
+
+app.delete('/api/regions/transaction', function(request, response) {
+  console.log('Delete Transaction..');
+  var id = request.query.id;
+  // var rev = request.query.rev; // Rev can be fetched from request. if
+  // needed, send the rev from client
+  console.log('Removing transaction of id: ' + id);
+  console.log('Request Query: ' + JSON.stringify(request.query));
+
+  db.get(
+    id,
+    {
+      revs_info: true
+    },
+    function(err, doc) {
+      if (!err) {
+        db.destroy(doc._id, doc._rev, function(err, res) {
+          // Handle response
+          if (err) {
+            console.log(err);
+            response.sendStatus(500);
+          } else {
+            response.sendStatus(200);
+          }
+        });
+      }
+    }
+  );
+});
+
+app.get('/api/regions/transaction', function(request, response) {
+  console.log('Get all transactions.. ');
+
+  db = cloudant.use(dbCredentials.dbName);
+  var transactionList = [];
+  var i = 0;
+  db.list(function(err, body) {
+    if (!err) {
+      var len = body.rows.length;
+      console.log('total # of transactions -> ' + len);
+      if (len == 0) {
+        // push sample data
+        // save doc
+        var data = {
+          regionid: 0,
+          regionName: 'sample_region',
+          institutionid: 0,
+          institutionName: 'sample_institution',
+          amount: 0
+        };
+
+        console.log('No Transaction');
+
+        transactionList.push(data);
+        response.write(JSON.stringify(transactionList));
+        console.log(JSON.stringify(transactionList));
+        console.log('ending response...');
+        response.end();
+      } else {
+        body.rows.forEach(function(document) {
+          db.get(
+            document.id,
+            {
+              revs_info: true
+            },
+            function(err, doc) {
+              if (!err) {
+                if (
+                  doc['id'] &&
+                  doc['region'] &&
+                  doc['regionName'] &&
+                  doc['institution'] &&
+                  doc['institutionName'] &&
+                  doc['amount']
+                ) {
+                  var data = {
+                    id: doc['id'],
+                    region: doc['region'],
+                    regionName: doc['regionName'],
+                    institution: doc['institution'],
+                    institutionName: doc['institutionName'],
+                    amount: doc['amount']
+                  };
+
+                  regionList.push(data);
+                }
+
+                i++;
+                if (i >= len) {
+                  response.write(JSON.stringify(transactionList));
+                  console.log('ending response...');
+                  response.end();
+                }
+              } else {
+                console.log(err);
+              }
+            }
+          );
+        });
+      }
+    } else {
+      console.log(err);
+    }
+  });
+});
+
 http.createServer(app).listen(app.get('port'), '0.0.0.0', function() {
   console.log('Express server listening on port ' + app.get('port'));
 });
