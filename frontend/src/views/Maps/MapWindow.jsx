@@ -6,7 +6,9 @@ class MapWindow extends Component {
 
   render() {
     const center = { lng: 144.9628, lat: -37.8102 };
-    let colors = this.gradient('#ff0000','#ffff00',6);
+
+    let colors = ['#242f3e']
+    Array.prototype.push.apply(colors, this.gradient('#ff0000','#ffff00',6));
     Array.prototype.push.apply(colors, this.gradient('#ffff00','#00ff00',6));
     let ratios = [];
     const min = 2;

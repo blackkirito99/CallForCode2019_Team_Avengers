@@ -103,7 +103,7 @@ class Maps extends Component {
           //   if (total > 20000)
           //     color = colors[5]
             return {
-              fillColor: this.props.colors[Math.floor(Math.random() * Math.floor(11))],
+              fillColor: this.props.colors[Math.floor(Math.random() * Math.floor(12))],
               fillOpacity: 0.7,
               strokeWeight: 1
             }
