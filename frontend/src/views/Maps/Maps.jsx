@@ -77,7 +77,7 @@ class Maps extends Component {
           ]
         }}
         onMapLoad={map => {
-          map.data.loadGeoJson('https://data.gov.au/geoserver/vic-suburb-locality-boundaries-psma-administrative-boundaries/wfs?request=GetFeature&typeName=ckan_af33dd8c_0534_4e18_9245_fc64440f742e&outputFormat=json');
+          // map.data.loadGeoJson('https://data.gov.au/geoserver/vic-suburb-locality-boundaries-psma-administrative-boundaries/wfs?request=GetFeature&typeName=ckan_af33dd8c_0534_4e18_9245_fc64440f742e&outputFormat=json');
           // (feature) => {
             
           // })
@@ -103,7 +103,7 @@ class Maps extends Component {
           //   if (total > 20000)
           //     color = colors[5]
             return {
-              fillColor: this.props.colors[Math.floor(Math.random() * Math.floor(12))],
+              fillColor: this.props.suburbColor[feature.getProperty('vic_loca_2')],
               fillOpacity: 0.7,
               strokeWeight: 1
             }

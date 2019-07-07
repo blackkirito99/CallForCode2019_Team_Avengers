@@ -10,19 +10,21 @@ class MapWindow extends Component {
     let colors = ['#242f3e']
     Array.prototype.push.apply(colors, this.gradient('#ff0000','#ffff00',6));
     Array.prototype.push.apply(colors, this.gradient('#ffff00','#00ff00',6));
-    let ratios = [];
-    const min = 2;
-    const max = 100;
-    const step = (max- min) / 12;
+    let suburbColor = [];
+    let min = 0;
+    let max = 0;
     // api call
     fetch("https://api.example.com/items")
       .then(res => res.json())
       .then(
         (result) => {
-            ratios.map((ratio) => {
-                let color = this.mapColor(ratio, min, step);
+            min = this.findMin(result.data);
+            max = this.findMax(result.data);
+            const step = (max- min) / 12;
+            suburbColor = result.data.map((suburb) => {
+                let color = this.mapColor(suburb.needed, min, step);
                 return {
-                    suburb: 'XXX',
+                    suburb: suburb.name,
                     color: color
                 };
             })
@@ -44,7 +46,7 @@ class MapWindow extends Component {
 
     return (
       <div style = {{position: relative}}>
-        <Maps name = "a"  colors = {colors}  ratio = {ratios} center = {center}>
+        <Maps name = "a"  colors = {colors}  suburbColor = {suburbColor} center = {center}>
         </Maps>
         <div style = {{position: 'fixed', bottom: '100px', right: '20px', zIndex: '10000'}}>
             <div style = {{width: '20px', height: '10px', backgroundColor: colors[0], position: 'relative'}}>
@@ -87,12 +89,24 @@ class MapWindow extends Component {
     return count + 1;
   }
 
-  findMax() {
-    return 0;
+  findMax(data) {
+    let max = 0;
+    data.forEach(suburb => {
+        if (suburb.needed > max) {
+            max = suburb.needed;
+        }
+    }); 
+    return max;
   }
 
-  findMin() {
-    return 100;
+  findMin(data) {
+    let min = Number.MAX_SAFE_INTEGER;
+    data.forEach(suburb => {
+        if (suburb.needed < min) {
+            min = suburb.needed;
+        }
+    }); 
+    return min;
   }
 
   gradient (startColor,endColor,step) {
